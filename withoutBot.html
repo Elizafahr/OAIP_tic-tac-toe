@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tic-tac-toe</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body> 
+  <div id="main">
+
+    <div> 
+      <h1>tic-tac-toe</h1>
+    </div>
+
+	  <div id="container">
+        <div>
+            <div id="gamePole">
+                <div class="pole"  myAtribut="0"></div>
+                <div class="pole"   myAtribut="1"></div>
+                <div class="pole"   myAtribut="2"></div>
+                <div class="pole"  myAtribut="3"></div>
+                <div class="pole"  myAtribut="4"></div>
+                <div class="pole"  myAtribut="5"></div>
+                <div class="pole" myAtribut="6"></div>
+                <div class="pole"  myAtribut="7"></div>
+                <div class="pole" myAtribut="8"></div>
+            </div> 
+            <p id="active">
+                Ходит: x
+            </p>
+            <input type="button" id="restart" onclick="gameRestart()" value="Начать сначала">
+        </div>
+
+        <div>
+            <div id="results">
+                <p>
+                    Выиграл x: <span id="winx">0</span>
+                </p>
+                <p>
+                    Выиграл 0: <span id="win0">0</span>
+                </p>
+                <p>
+                    Ничья: <span id="both">0</span>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+  </div>
+<script>
+
+var active = document.getElementById('active');
+var win_x = document.getElementById('winx');
+var win_0 = document.getElementById('win0');
+var win_both = document.getElementById('both');
+var restart = document.getElementById('restart');
+var pole = document.getElementsByClassName('pole');
+var player = 'x';// Устанавливаем начального игрока
+
+var paused = false;// Флаг для проверки, находится ли игра в паузе
+var data = []; // Массив для хранения данных о заполненных ячейках
+var win = {x: 0, '0': 0, both: 0};// Объект для хранения статистики побед
+var stepCount = 0;// Счетчик ходов
+var winIndex = [// Массив с выигрышными комбинациями ячеек
+  [0, 1, 2], 
+  [3, 4, 5], 
+  [6, 7, 8], 
+  [0, 3, 6], 
+  [1, 4, 7], 
+  [2, 5, 8], 
+  [0, 4, 8], 
+  [2, 4, 6]
+];
+
+for (var i = 0; i < pole.length; i++) {// Добавляем обработчики событий на ячейки игрового поля
+  addEvent(pole[i]);
+}
+
+function addEvent(pole) {// Функция для добавления обработчика события на ячейку игрового поля
+    pole.addEventListener('click', step);
+  function step() {
+    if (!pole.innerHTML && !paused) {    // Проверяем, не заполнена ли ячейка и не находится ли игра в паузе
+      pole.innerHTML = player;      // Заполняем ячейку и добавляем данные о заполненной ячейке в массив
+      var id = pole.getAttribute('myAtribut');
+      data[id] = player;
+      stepCount++;
+      // Проверяем, есть ли выигрышная комбинация или закончились ли ходы
+      if (checkWin()) {        // Если есть выигрышная комбинация, то выводим сообщение о победе и увеличиваем соответствующую статистику
+        active.innerHTML = 'Выиграл: ' + player;
+        win[player]++;
+        stepCount = 0;
+        paused = true;
+      } 
+      else {        // Если выигрышной комбинации нет, то меняем игрока
+        player = player === 'x' ? '0' : 'x';
+        active.innerHTML = 'Ходит: ' + player;
+      }
+      
+      if (stepCount >= 9) {      // Если закончились ходы, то выводим сообщение о ничьей и увеличиваем соответствующую статистику
+        win.both++;
+        stepCount = 0;
+        active.innerHTML = 'Ничья';
+      }
+      
+      win_x.innerHTML = win.x; // Обновляем статистику побед
+      win_0.innerHTML = win['0']; 
+      win_both.innerHTML = win.both; 
+    }  
+  }
+}
+
+
+
+function checkWin() {// Функция для проверки наличия выигрышной комбинации
+  for (var i = 0; i < winIndex.length; i++) {
+    var id = winIndex[i];
+    var check = data[id[0]] &&
+      data[id[0]] == data[id[1]] && 
+      data[id[1]] == data[id[2]];
+    
+    if (check) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+function gameRestart() {// Функция для очистки игрового поля и массива с данными о заполненных ячейках, а также для снятия паузы
+    for (var i = 0; i < pole.length; i++) {
+        pole[i].innerHTML = '';
+    }
+    player = player === 'x' ? '0' : 'x';
+    active.innerHTML = 'Ходит: ' + player;
+
+    data = [];
+    paused = false;
+}
+</script>
+</body>
+</html>
